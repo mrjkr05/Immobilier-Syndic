@@ -171,20 +171,23 @@ COMMIT;
    ON contrat.code_bien=bien_immobilier.code_bien
    	GROUP BY contrat.numcontrat
 
-4)SELECT syndic.nom_syndic 
-	FROM `syndic` 
-	INNER JOIN `contrat` 
-	on contrat.code_syndic=syndic.code_syndic 
-	INNER JOIN `bien_immobilier` 
-	on contrat.code_bien=bien_immobilier.code_bien 
-	INNER JOIN `quartier` 
-	on bien_immobilier.code_quartier=quartier.code_quartier 
-	INNER JOIN `ville` 
-	on ville.code_ville=quartier.code_ville 
-	INNER JOIN `region` 
-	on region.code_region=ville.code_region 
-	WHERE region.nom_region='oriental' 
-	AND syndic.code_syndic not in (SELECT code_syndic FROM contrat) 
+4)SELECT syndic.nom_syndic
+ FROM `syndic`
+  INNER JOIN `contrat`
+   on contrat.code_syndic=syndic.code_syndic
+    INNER JOIN `bien_immobilier`
+     on contrat.code_bien=bien_immobilier.code_bien
+      INNER JOIN `quartier`
+      	on bien_immobilier.code_quartier=quartier.code_quartier
+      	 INNER JOIN `ville`
+      	  on ville.code_ville=quartier.code_ville
+      	   INNER JOIN `region`
+      	    on region.code_region=ville.code_region
+      	     WHERE region.nom_region='oriental'
+      	      AND syndic.code_syndic not in (
+      	      	SELECT code_syndic
+      	      	 FROM contrat
+      	      	 ) 
 
 5)SELECT bien_immobilier.*,MAX(contrat.prix_mensuel)
 	 FROM `bien_immobilier` 
