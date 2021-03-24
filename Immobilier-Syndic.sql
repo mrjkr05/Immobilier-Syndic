@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : mar. 23 mars 2021 à 03:24
+-- Généré le : mer. 24 mars 2021 à 13:27
 -- Version du serveur :  5.7.31
 -- Version de PHP : 7.3.21
 
@@ -20,6 +20,18 @@ SET time_zone = "+00:00";
 --
 -- Base de données : `vigilence`
 --
+
+DELIMITER $$
+--
+-- Fonctions
+--
+DROP FUNCTION IF EXISTS `question_one`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `question_one` (`type_quartie` VARCHAR(20)) RETURNS INT(11) RETURN (SELECT COUNT(*) FROM `quartier`
+INNER JOIN `bien_immobilier`
+ON quartier.code_quartier=bien_immobilier.code_quartier 
+WHERE bien_immobilier.type = type_quartie)$$
+
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -38,7 +50,16 @@ CREATE TABLE IF NOT EXISTS `bien_immobilier` (
   `date_construction` date DEFAULT NULL,
   PRIMARY KEY (`code_bien`),
   KEY `code_quartier` (`code_quartier`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Déchargement des données de la table `bien_immobilier`
+--
+
+INSERT INTO `bien_immobilier` (`code_bien`, `adresse_bien`, `num_enregistrement`, `superficie`, `type`, `code_quartier`, `date_construction`) VALUES
+(1, '3 rue adda', 1, 60, 'batiment', 1, '2020-02-12'),
+(2, '16 darb el yahoude', 2, 70, 'batiment', 1, '2020-02-12'),
+(3, 'rue al atlas', 3, 1200, 'immuble', 3, '2020-02-12');
 
 -- --------------------------------------------------------
 
@@ -49,14 +70,23 @@ CREATE TABLE IF NOT EXISTS `bien_immobilier` (
 DROP TABLE IF EXISTS `contrat`;
 CREATE TABLE IF NOT EXISTS `contrat` (
   `numcontrat` int(11) NOT NULL AUTO_INCREMENT,
-  `prix_mensuel` double DEFAULT NULL,
+  `prix_mensuel` double UNSIGNED DEFAULT NULL,
   `code_bien` int(11) DEFAULT NULL,
   `code_syndic` int(11) DEFAULT NULL,
-  `etat` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `etat` varchar(20) COLLATE utf8_unicode_ci DEFAULT '{active,resillie}',
   PRIMARY KEY (`numcontrat`),
   KEY `code_bien` (`code_bien`,`code_syndic`),
   KEY `code_syndic` (`code_syndic`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Déchargement des données de la table `contrat`
+--
+
+INSERT INTO `contrat` (`numcontrat`, `prix_mensuel`, `code_bien`, `code_syndic`, `etat`) VALUES
+(1, 25000, 1, 3, 'bien'),
+(2, 2000, 2, 3, 'pas bien'),
+(3, 50000, 3, 1, 'moyan');
 
 -- --------------------------------------------------------
 
@@ -73,7 +103,16 @@ CREATE TABLE IF NOT EXISTS `quartier` (
   `total_quartier` int(11) DEFAULT NULL,
   PRIMARY KEY (`code_quartier`),
   KEY `code_ville` (`code_ville`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Déchargement des données de la table `quartier`
+--
+
+INSERT INTO `quartier` (`code_quartier`, `nom_quartier`, `population_quartier`, `code_ville`, `total_quartier`) VALUES
+(1, 'Gheraba Al Aalya', 120, 1, 2),
+(2, 'Merbouha', 120, 1, 2),
+(3, 'Maarif 1', 1200, 3, 2);
 
 -- --------------------------------------------------------
 
@@ -88,7 +127,16 @@ CREATE TABLE IF NOT EXISTS `region` (
   `population_region` double DEFAULT NULL,
   `total_region` int(11) DEFAULT NULL,
   PRIMARY KEY (`code_region`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Déchargement des données de la table `region`
+--
+
+INSERT INTO `region` (`code_region`, `nom_region`, `population_region`, `total_region`) VALUES
+(1, 'Oriental', 2000, 1),
+(2, 'Nord', 1000, 1),
+(3, 'CasaBlanca', 20000, 1);
 
 -- --------------------------------------------------------
 
@@ -104,7 +152,16 @@ CREATE TABLE IF NOT EXISTS `syndic` (
   `telephone_syndic` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
   `mot_depasse` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`code_syndic`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Déchargement des données de la table `syndic`
+--
+
+INSERT INTO `syndic` (`code_syndic`, `nom_syndic`, `prenom_syndic`, `telephone_syndic`, `mot_depasse`) VALUES
+(1, 'azenayn', 'mimoun', '0606060606', 'mimoun1212'),
+(2, 'jerroudi', 'abdelmonaim', '0606060606', 'pedopedo123'),
+(3, 'mimi', 'titi', '0606060606', 'testtest123');
 
 -- --------------------------------------------------------
 
@@ -116,11 +173,20 @@ DROP TABLE IF EXISTS `ville`;
 CREATE TABLE IF NOT EXISTS `ville` (
   `code_ville` int(11) NOT NULL AUTO_INCREMENT,
   `nom_ville` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `code_region` int(11) DEFAULT NULL,
+  `code_region` int(11) NOT NULL,
   `total_ville` int(11) DEFAULT NULL,
   PRIMARY KEY (`code_ville`),
   KEY `code_region` (`code_region`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Déchargement des données de la table `ville`
+--
+
+INSERT INTO `ville` (`code_ville`, `nom_ville`, `code_region`, `total_ville`) VALUES
+(1, 'Berkane', 1, 1),
+(2, 'Tafoughalt', 1, 1),
+(3, 'Maarif', 3, 1);
 
 --
 -- Contraintes pour les tables déchargées
@@ -154,8 +220,9 @@ COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION  */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 
+/*!Niveau 1*/;
 
 2)SELECT count(*),ville.nom_ville  
  FROM `bien_immobilier` 
@@ -224,3 +291,16 @@ COMMIT;
     inner join `contrat`
      on contrat.code_bien=bien_immobilier.code_bien
       HAVING COUNT(contrat.numcontrat) > 0
+
+/*!Niveau 2*/;
+
+1)
+CREATE FUNCTION question_one(type_quartie varchar(20))
+RETURNS int
+RETURN (SELECT COUNT(*) FROM `quartier`
+INNER JOIN `bien_immobilier`
+ON quartier.code_quartier=bien_immobilier.code_quartier 
+WHERE bien_immobilier.type = type_quartie)
+GROUP BY quartier.nom_quartier
+
+2)
